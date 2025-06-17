@@ -1,5 +1,5 @@
 from django import forms
-from .models import Book
+from .models import Book, Category
 
 class BookForm(forms.ModelForm):
     class Meta:
@@ -11,8 +11,8 @@ class BookForm(forms.ModelForm):
             'authors': forms.TextInput(attrs={'class': 'form-control'}),
             'isbn': forms.TextInput(attrs={'class': 'form-control'}),
             'publisher': forms.TextInput(attrs={'class': 'form-control'}),
-            'publication_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'introduction': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'publication_date': forms.DateInput(attrs={'type': 'date'}),
+            'introduction': forms.Textarea(attrs={'rows': 4}),
             'cover': forms.FileInput(attrs={'class': 'form-control'}),
             'quantity': forms.NumberInput(attrs={'class': 'form-control', 'min': '0'}),
         }
