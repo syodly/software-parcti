@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}登录 - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">用户登录</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            用户名或密码错误，请重试。
+                        </div>
+                    {% endif %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    <div class="mb-3">
+                        <label for="id_user_type" class="form-label">用户类型</label>
+                        <select name="user_type" class="form-select" id="id_user_type" required>
+                            <option value="student">学生</option>
+                            <option value="teacher">教师</option>
+                            <option value="admin">管理员</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_username" class="form-label">用户名</label>
+                        <input type="text" name="username" class="form-control" id="id_username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_password" class="form-label">密码</label>
+                        <input type="password" name="password" class="form-control" id="id_password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">登录</button>
+                    <a href="{% url 'users:register' %}" class="btn btn-link">没有账号？立即注册</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

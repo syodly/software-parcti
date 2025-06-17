@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}图书列表 - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>图书列表</h2>
+            <div class="d-flex gap-2">
+                <!-- 搜索框 -->
+                <form class="d-flex" method="get">
+                    <input class="form-control me-2" type="search" placeholder="搜索图书..." name="q" value="{{ request.GET.q }}">
+                    <button class="btn btn-outline-primary" type="submit">搜索</button>
+                </form>
+                
+                {% if user.is_authenticated and user.user_type in 'teacher,admin' %}
+                    <a href="{% url 'books:book_add' %}" class="btn btn-primary">添加图书</a>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if books %}
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                {% for book in books %}
+                    <div class="col">
+                        <div class="card h-100">
+                            {% if book.cover %}
+                                <img src="{{ book.cover.url }}" class="card-img-top" alt="{{ book.title }}">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ book.title }}</h5>
+                                <p class="card-text">
+                                    <small class="text-muted">作者：{{ book.authors }}</small><br>
+                                    <small class="text-muted">ISBN：{{ book.isbn }}</small>
+                                </p>
+                                <p class="card-text">{{ book.introduction|truncatewords:30 }}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <a href="{% url 'books:book_detail' book.pk %}" class="btn btn-primary">查看详情</a>
+                                    {% if user.is_authenticated %}
+                                        {% if user.user_type == 'admin' %}
+                                            <div class="btn-group">
+                                                <a href="{% url 'books:book_edit' book.pk %}" class="btn btn-warning">编辑</a>
+                                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ book.pk }}">
+                                                    删除
+                                                </button>
+                                            </div>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if user.is_authenticated and user.user_type == 'admin' %}
+                        <!-- 删除确认模态框 -->
+                        <div class="modal fade" id="deleteModal{{ book.pk }}" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">确认删除</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        确定要删除《{{ book.title }}》吗？此操作不可撤销。
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                        <form action="{% url 'books:book_delete' book.pk %}" method="post" style="display: inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">确认删除</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>暂无图书信息</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 
