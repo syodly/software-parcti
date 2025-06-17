@@ -31,47 +31,38 @@ def book_detail(request, pk):
     })
 
 @login_required
-def book_add(request):
-    if request.user.user_type not in ['teacher', 'admin']:
-        return HttpResponseForbidden('您没有添加图书的权限')
-    
+def book_create(request):
     if request.method == 'POST':
         form = BookForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            messages.success(request, '图书添加成功！')
-            return redirect('books:book_list')
+            book = form.save()
+            messages.success(request, '图书创建成功！')
+            return redirect('books:book_detail', pk=book.pk)
     else:
         form = BookForm()
-    return render(request, 'books/book_form.html', {'form': form, 'title': '添加图书'})
+    return render(request, 'books/book_form.html', {'form': form, 'title': '新增图书'})
 
 @login_required
 def book_edit(request, pk):
-    if request.user.user_type != 'admin':
-        return HttpResponseForbidden('您没有修改图书的权限')
-    
     book = get_object_or_404(Book, pk=pk)
     if request.method == 'POST':
         form = BookForm(request.POST, request.FILES, instance=book)
         if form.is_valid():
-            form.save()
-            messages.success(request, '图书信息更新成功！')
-            return redirect('books:book_detail', pk=pk)
+            book = form.save()
+            messages.success(request, '图书更新成功！')
+            return redirect('books:book_detail', pk=book.pk)
     else:
         form = BookForm(instance=book)
     return render(request, 'books/book_form.html', {'form': form, 'title': '编辑图书'})
 
 @login_required
 def book_delete(request, pk):
-    if request.user.user_type != 'admin':
-        return HttpResponseForbidden('您没有删除图书的权限')
-    
     book = get_object_or_404(Book, pk=pk)
     if request.method == 'POST':
         book.delete()
         messages.success(request, '图书删除成功！')
         return redirect('books:book_list')
-    return redirect('books:book_detail', pk=pk)
+    return render(request, 'books/book_confirm_delete.html', {'book': book})
 
 @login_required
 def borrow_book(request, pk):
